@@ -2,10 +2,10 @@ global:
   resolve_timeout: 5m
 
 route:
-  receiver: discord
+  receiver: "Mail Alert"
   group_wait: 30s
   group_interval: 5m
-  repeat_interval: 12h
+  repeat_interval: 1m
 
 receivers:
   - name: discord
@@ -17,6 +17,18 @@ receivers:
     webhook_configs:
       - url: "slack_url..."
         send_resolved: true
+
+  - name: "Mail Alert"
+    email_configs:
+      - smarthost: "<smpthserver.domain>:587"
+        auth_username: "<sender@address.com>"
+        auth_identity: "<sender@address.com>"
+        auth_password: "<password>"
+        from: "<sender@address.com>"
+        to: "<receiver@address.com>"
+        send_resolved: true
+        headers:
+          subject: "Prometheus Mail Alerts"
 
 inhibit_rules:
   - source_match:

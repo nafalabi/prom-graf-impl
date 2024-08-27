@@ -6,10 +6,8 @@ global:
 alerting:
   alertmanagers:
     - static_configs:
-      - targets: []
-      scheme: http
+      - targets: ['alertmanager:9093']
       timeout: 10s
-      api_version: v1
 
 rule_files:
   - /etc/prometheus/alert_rules.yml

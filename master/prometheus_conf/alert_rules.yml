@@ -18,3 +18,23 @@ groups:
         annotations:
           summary: "High Memory Usage Detected"
           description: "Available memory is below 20% for more than 5 minutes on instance {{ $labels.instance }}"
+
+      - alert: HighStorageUsage
+        expr: 100 * (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes{mountpoint="/"})) > 50
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High storage usage on {{ $labels.instance }}"
+          description: "Storage usage on {{ $labels.instance }} is greater than 50%."
+
+  - name: alert.rules
+    rules:
+    - alert: InstanceDown
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: "critical"
+      annotations:
+        summary: "Endpoint {{ $labels.instance }} down"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minutes."

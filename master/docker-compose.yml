@@ -21,21 +21,23 @@ services:
     networks:
       - monitoring
 
-  # alertmanager:
-  #   image: prom/alertmanager:v0.27.0
-  #   container_name: alertmanager
-  #   volumes:
-  #     - alertmanager_data:/alertmanager
-  #     - "./alertmanage_conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml"
-  #   command:
-  #     - "--config.file=/etc/alertmanager/alertmanager.yml"
-  #     - "--storage.path=/alertmanager"
-  #     - "--web.listen-address=:9093"
-  #   networks:
-  #     - monitoring
-  #   depends_on:
-  #     - node-exporter
-  #   restart: unless-stopped
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: unless-stopped
+    volumes:
+      - alertmanager_data:/alertmanager
+      - "./alertmanager_conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml"
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--web.listen-address=:9093"
+    expose:
+      - 9093
+    networks:
+      - monitoring
+    depends_on:
+      - node-exporter
 
   prometheus:
     image: prom/prometheus:latest
