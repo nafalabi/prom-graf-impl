@@ -6,6 +6,7 @@ Vagrant.configure("2") do |config|
     # master.vm.provision :docker_compose
     master.vm.box = "hashicorp/bionic64"
     master.vm.box_version = "1.0.282"
+    master.vm.network "private_network", ip: "192.168.56.2"
     master.vm.provision :shell, inline: "sh /vagrant/retrieve-docker.sh"
     master.vm.provision :shell, inline: "sh /vagrant/install-docker.sh"
   end
@@ -15,6 +16,7 @@ Vagrant.configure("2") do |config|
     # client1.vm.provision :docker_compose
     client1.vm.box = "hashicorp/bionic64"
     client1.vm.box_version = "1.0.282"
+    client1.vm.network "private_network", ip: "192.168.56.3"
     client1.vm.provision :shell, inline: "sh /vagrant/install-docker.sh"
   end
   
@@ -23,6 +25,7 @@ Vagrant.configure("2") do |config|
     # client2.vm.provision :docker_compose
     client2.vm.box = "hashicorp/bionic64"
     client2.vm.box_version = "1.0.282"
+    client2.vm.network "private_network", ip: "192.168.56.4"
     client2.vm.provision :shell, inline: "sh /vagrant/install-docker.sh"
   end
 
