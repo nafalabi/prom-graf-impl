@@ -14,5 +14,19 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     expose:
       - 9100
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
     ports:
-      - 9100:9100
+      - "9100:9100"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - node-exporter
+
+networks:
+  monitoring:
+    external: false
+
