@@ -50,7 +50,7 @@ receivers:
            {{ end }}
          {{ end }}
 
-  - name: "Mail Alert"
+  - name: "mail-alert"
     email_configs:
       - smarthost: "<__smpthserver.domain:587__>"
         auth_username: "<__sender@address.com__>"
