@@ -13,8 +13,7 @@ http {
         # Prometheus IP
         allow __PROMETHEUS_IP__;
         deny all;
-
-        server_name __DOMAIN_NAME__;
+        server_tokens off;
 
         location / {
             proxy_pass http://node_exporter_upstream;
