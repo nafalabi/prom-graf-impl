@@ -1,3 +1,3 @@
 #!/bin/sh
-stress-ng --matrix 0
+docker run -it --rm alexeiled/stress-ng --matrix 0
 

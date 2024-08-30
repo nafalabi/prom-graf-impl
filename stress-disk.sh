@@ -18,5 +18,5 @@ fi
 echo "  Allocating 20G..."
 echo
 
-fio --name=test --rw=write --bs=1M --iodepth=32 --filename=/tmp/test --size=$ALLOCATION_SIZE
+docker run -it --rm -v $PWD:/tmp infrabuilder/fio fio --name=test --rw=write --bs=1M --iodepth=32 --filename=/tmp/test --size=$ALLOCATION_SIZE
 
