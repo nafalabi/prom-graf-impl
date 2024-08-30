@@ -3,30 +3,53 @@ groups:
     rules:
       - alert: HighCpuUsage
         expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
-        for: 5m
+        for: 2m
         labels:
           severity: warning
         annotations:
+          title: "{{ $labels.instance }} is under high load"
           summary: "High CPU Usage Detected"
-          description: "CPU usage is above 80% for more than 5 minutes on instance {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 2 minutes on instance {{ $labels.instance }}"
+
+      - alert: HighCpuUsageCritical
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          title: "{{ $labels.instance }} is under critical load"
+          summary: "High CPU Usage Detected"
+          description: "CPU usage is above 95% for more than 15 minutes on instance {{ $labels.instance }}"
 
       - alert: HighMemoryUsage
         expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 20
-        for: 5m
+        for: 2m
         labels:
           severity: warning
         annotations:
+          title: "{{ $labels.instance }} is under high load"
           summary: "High Memory Usage Detected"
-          description: "Available memory is below 20% for more than 5 minutes on instance {{ $labels.instance }}"
+          description: "Available memory is below 20% for more than 2 minutes on instance {{ $labels.instance }}"
+
+      - alert: HighMemoryUsageCritical
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          title: "{{ $labels.instance }} is under critical load"
+          summary: "High Memory Usage Detected"
+          description: "Available memory is below 10% for more than 15 minutes on instance {{ $labels.instance }}"
 
       - alert: HighStorageUsage
-        expr: 100 * (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes{mountpoint="/"})) > 50
+        expr: 100 * (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes{mountpoint="/"})) > 80
         for: 1m
         labels:
           severity: critical
         annotations:
+          title: "{{ $labels.instance }} is running out of storage"
           summary: "High storage usage on {{ $labels.instance }}"
-          description: "Storage usage on {{ $labels.instance }} is greater than 50%."
+          description: "Storage usage on {{ $labels.instance }} is greater than 80%."
 
   - name: alert.rules
     rules:
@@ -36,5 +59,6 @@ groups:
       labels:
         severity: "critical"
       annotations:
+        title: "{{ $labels.instance }} is down"
         summary: "Endpoint {{ $labels.instance }} down"
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minutes."

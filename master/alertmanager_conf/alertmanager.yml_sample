@@ -1,0 +1,70 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: "<__slack.api/url/webhook__>"
+
+route:
+  receiver: "slack-notifications"
+  group_wait: 30s
+  group_interval: 1m
+  repeat_interval: 5m
+  routes:
+    - receiver: "slack-notifications"
+      group_wait: 10s
+      match_re:
+        severity: critical|warning
+      continue: true
+
+    - receiver: "mail-alert"
+      group_wait: 10s
+      match_re:
+        severity: critical|warning
+      continue: true
+
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - channel: "#prometheus-alert"
+        send_resolved: true
+        icon_url: https://avatars3.githubusercontent.com/u/3380462
+        title: |-
+         [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+         {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
+           {{" "}}(
+           {{- with .CommonLabels.Remove .GroupLabels.Names }}
+             {{- range $index, $label := .SortedPairs -}}
+               {{ if $index }}, {{ end }}
+               {{- $label.Name }}="{{ $label.Value -}}"
+             {{- end }}
+           {{- end -}}
+           )
+         {{- end }}
+        text: >-
+         {{ range .Alerts -}}
+         *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+
+         *Description:* {{ .Annotations.description }}
+
+         *Details:*
+           {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+           {{ end }}
+         {{ end }}
+
+  - name: "Mail Alert"
+    email_configs:
+      - smarthost: "<__smpthserver.domain:587__>"
+        auth_username: "<__sender@address.com__>"
+        auth_identity: "<__sender@address.com__>"
+        auth_password: "<__password__>"
+        from: "<__sender@address.com__>"
+        to: "<__receiver@address.com__>"
+        send_resolved: true
+        headers:
+          subject: "Prometheus Mail Alerts - {{ .CommonAnnotations.title }}"
+
+inhibit_rules:
+  - source_match:
+      severity: "critical"
+    target_match:
+      severity: "warning"
+    equal: ["alertname", "instance"]
