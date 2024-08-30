@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cp /vagrant/resources/docker/* /usr/bin/
 
 sudo groupadd docker

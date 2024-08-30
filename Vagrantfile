@@ -9,9 +9,9 @@ Vagrant.configure("2") do |config|
     master.vm.box_version = "1.0.282"
     master.vm.network "private_network", ip: "192.168.56.2"
     master.vm.provision :shell, inline: <<-SCRIPT
-      sh /vagrant/retrieve-docker.sh
-      sh /vagrant/install-docker.sh
-      /vagrant/client/setup.sh 192.168.56.2
+      bash /vagrant/retrieve-docker.sh
+      bash /vagrant/install-docker.sh
+      bash /vagrant/client/setup.sh 192.168.56.2
       docker compose -f /vagrant/master/docker-compose.yml up -d
     SCRIPT
   end
@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
     client1.vm.box_version = "1.0.282"
     client1.vm.network "private_network", ip: "192.168.56.3"
     client1.vm.provision :shell, inline: <<-SCRIPT
-      sh /vagrant/install-docker.sh
+      bash /vagrant/install-docker.sh
       docker compose -f /vagrant/client/docker-compose.yml up -d
     SCRIPT
   end
@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
     client2.vm.box_version = "1.0.282"
     client2.vm.network "private_network", ip: "192.168.56.4"
     client2.vm.provision :shell, inline: <<-SCRIPT
-      sh /vagrant/install-docker.sh
+      bash /vagrant/install-docker.sh
       docker compose -f /vagrant/client/docker-compose.yml up -d
     SCRIPT
   end
