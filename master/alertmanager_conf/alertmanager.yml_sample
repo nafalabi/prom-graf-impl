@@ -18,6 +18,7 @@ route:
       group_wait: 10s
       match_re:
         severity: critical|warning
+        job: client1.local
       continue: true
 
 
