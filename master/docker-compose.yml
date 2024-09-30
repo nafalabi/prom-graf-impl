@@ -78,6 +78,19 @@ services:
     environment:
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/node_exporter.json
 
+  utils:
+    build:
+      context: ./utils
+      dockerfile: Dockerfile
+    working_dir: /workdir
+    volumes:
+      - ./utils/scripts:/workdir
+    networks:
+      - monitoring
+    profiles:
+      - utils
+    restart: "no"
+
 volumes:
   grafana_data: {}
   grafana_logs: {}
