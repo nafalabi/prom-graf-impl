@@ -7,7 +7,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          title: "{{ $labels.instance }} is under high load"
+          title: "{{ $labels.job }} ({{ $labels.instance }}) is under high load"
           summary: "High CPU Usage Detected"
           description: "CPU usage is above 80% for more than 2 minutes on instance {{ $labels.instance }}"
 
@@ -17,7 +17,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          title: "{{ $labels.instance }} is under critical load"
+          title: "{{ $labels.job }} ({{ $labels.instance }}) is under critical load"
           summary: "High CPU Usage Detected"
           description: "CPU usage is above 95% for more than 15 minutes on instance {{ $labels.instance }}"
 
@@ -27,7 +27,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          title: "{{ $labels.instance }} is under high load"
+          title: "{{ $labels.job }} ({{ $labels.instance }}) is under high load"
           summary: "High Memory Usage Detected"
           description: "Available memory is below 20% for more than 2 minutes on instance {{ $labels.instance }}"
 
@@ -37,7 +37,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          title: "{{ $labels.instance }} is under critical load"
+          title: "{{ $labels.job }} ({{ $labels.instance }}) is under critical load"
           summary: "High Memory Usage Detected"
           description: "Available memory is below 10% for more than 15 minutes on instance {{ $labels.instance }}"
 
@@ -47,7 +47,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          title: "{{ $labels.instance }} is running out of storage"
+          title: "{{ $labels.job }} ({{ $labels.instance }}) is running out of storage"
           summary: "High storage usage on {{ $labels.instance }}"
           description: "Storage usage on {{ $labels.instance }} is greater than 80%."
 
@@ -59,6 +59,6 @@ groups:
       labels:
         severity: "critical"
       annotations:
-        title: "{{ $labels.instance }} is down"
+        title: "{{ $labels.job }} ({{ $labels.instance }}) is down"
         summary: "Endpoint {{ $labels.instance }} down"
         description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minutes."
