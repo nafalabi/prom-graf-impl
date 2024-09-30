@@ -122,6 +122,7 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
+    log.Printf("Could not read request body: %v", err)
 		http.Error(w, "Could not read request body", http.StatusInternalServerError)
 		return
 	}
@@ -129,6 +130,7 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
+    log.Printf("Could not read request body: %v", err)
 		http.Error(w, "Invalid request payload: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -142,13 +144,13 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 
 	receivers, error := getReceivers()
 	if error != nil {
-    fmt.Printf("Error getting list of receivers: %s", error.Error())
+    log.Printf("Error getting list of receivers: %v", error)
 		return
 	}
 
 	var recipients []string
 	for groupName, addresses := range receivers {
-		fmt.Printf("Adding receivers from group '%s' ...", groupName)
+		log.Printf("Adding receivers from group '%s' ...", groupName)
 		recipients = append(recipients, addresses...)
 	}
 
