@@ -10,15 +10,15 @@ route:
   routes:
     - receiver: "slack-notifications"
       group_wait: 10s
-      match_re:
-        severity: critical|warning
+      matchers:
+        - severity =~ "critical|warning"
       continue: true
 
     - receiver: "mail-alert"
       group_wait: 10s
-      match_re:
-        severity: critical|warning
-        job: client1.local
+      matchers:
+        - severity =~ "critical|warning"
+        - job = client1.local
       continue: true
 
 
