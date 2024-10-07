@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"log"
 	"mailgun-relay/sender"
 	templt "mailgun-relay/template"
@@ -11,10 +10,7 @@ import (
 	_ "embed"
 )
 
-type Receivers = map[string][]string
-
 var logger = utils.NewLogger(utils.INFO)
-
 
 func alertHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Starting sending mail alerts...")
@@ -37,15 +33,6 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 		subject += "No Alerts"
 	}
 
-	var buff bytes.Buffer
-	tmpl := templt.GetTemplate()
-	err = tmpl.Execute(&buff, payload)
-	if err != nil {
-		sendError(err)
-		return
-	}
-  mailBody := buff.String()
-
 	var config sender.Config
 	err = utils.ReadAndUnmarshal("config.json", &config)
 	if err != nil {
@@ -53,7 +40,7 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-  err = sender.SendMail(config, subject, mailBody)
+	err = sender.SendMail(config, subject, payload)
 	if err != nil {
 		sendError(err)
 		return
@@ -63,7 +50,7 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Alert successfully processed")
 }
 
-func templateTest(w http.ResponseWriter, r *http.Request) {
+func webtestHandler(w http.ResponseWriter, r *http.Request) {
 	sendError := func(err error) {
 		logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -87,7 +74,7 @@ func templateTest(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/alert", alertHandler)
-	http.HandleFunc("/webtest", templateTest)
+	http.HandleFunc("/webtest", webtestHandler)
 
 	logger.Info("Starting webhook server on :5001")
 	if err := http.ListenAndServe(":5001", nil); err != nil {

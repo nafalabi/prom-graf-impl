@@ -13,6 +13,7 @@ type MailgunConfig struct {
 }
 
 type EngineConfig struct {
+	Name          string         `json:"name"`
 	Engine        string         `json:"engine"` // smtp or mailgun
 	Sender        string         `json:"sender"`
 	Receivers     []string       `json:"receivers"`

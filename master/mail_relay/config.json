@@ -1,6 +1,7 @@
 {
   "smtp": {
     "engine": "smtp",
+    "name": "Local Integration Testing",
     "sender": "no-reply@example.com",
     "receivers": ["receiver1@example.com", "receiver2@example.com"],
     "smtp_config": {
@@ -12,6 +13,7 @@
   },
   "mailgun": {
     "engine": "mailgun",
+    "name": "Local Integration Testing",
     "sender": "no-reply@mg.example.com",
     "receivers": ["receiver1@example.com", "receiver2@example.com"],
     "mailgun_config": {
