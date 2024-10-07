@@ -69,7 +69,6 @@ func webtestHandler(w http.ResponseWriter, r *http.Request) {
 		sendError(err)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
