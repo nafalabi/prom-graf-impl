@@ -16,7 +16,7 @@ WORKDIR /app/bin
 COPY --from=go-builder /build/bin/* /app/bin/
 COPY --from=go-builder /build/template/* /app//bin/template/
 COPY --from=go-builder /build/bawana.png /app/bin/
-COPY --from=go-builder /build/receivers.json /app/bin/
+COPY --from=go-builder /build/config.json /app/bin/
 COPY --from=go-builder /build/webhook_req.json /app/bin/
 COPY --from=go-builder /build/test-run.sh /app/bin/
 
