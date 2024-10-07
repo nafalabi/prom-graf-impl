@@ -129,7 +129,6 @@ func templateTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := templt.GetTemplate()
-	// err = tmpl.ExecuteTemplate(w, "email.default.html", payload)
 	err = tmpl.Execute(w, payload)
 	if err != nil {
 		sendError(err)
@@ -142,7 +141,7 @@ func main() {
 	http.HandleFunc("/alert", alertHandler)
 	http.HandleFunc("/webtest", templateTest)
 
-	log.Println("Starting webhook server on :5001")
+	logger.Info("Starting webhook server on :5001")
 	if err := http.ListenAndServe(":5001", nil); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

@@ -78,6 +78,14 @@ services:
     environment:
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/node_exporter.json
 
+  mail_relay:
+    build:
+      context: ./mailgun_relay
+      dockerfile: Dockerfile
+    expose: ["5001"]
+    networks:
+      - monitoring
+
   utils:
     build:
       context: ./utils

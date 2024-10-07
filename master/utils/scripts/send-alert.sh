@@ -23,14 +23,17 @@ curl -XPOST "$url" -H "Content-Type: application/json" -d "[{
         \"alertname\": \"$name\",
         \"service\": \"dummy-service\",
         \"severity\": \"warning\",
+        \"job\": \"node_exporter\",
         \"instance\": \"$name\"
     },
     \"annotations\": {
-        \"summary\": \"High latency is high!\"
+        \"summary\": \"Testing local nanda bawana\",
+        \"title\": \"Title testing local\",
+        \"description\": \"Description testing local\"
     },
     \"startsAt\": \"$now\",
     \"endsAt\": \"0001-01-01T00:00:00Z\",
-    \"generatorURL\": \"http://prometheus.int.example.net/<generating_expression>\"
+    \"generatorURL\": \"http://localhost\"
 }]"
 
 echo ""
