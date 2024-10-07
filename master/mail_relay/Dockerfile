@@ -19,6 +19,5 @@ COPY --from=go-builder /build/bawana.png /app/bin/
 COPY --from=go-builder /build/receivers.json /app/bin/
 COPY --from=go-builder /build/webhook_req.json /app/bin/
 COPY --from=go-builder /build/test-run.sh /app/bin/
-COPY --from=go-builder /build/.env /app/bin/
 
 CMD ["/app/bin/mail-relay"]
