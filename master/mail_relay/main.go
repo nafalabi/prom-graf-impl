@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"mailgun-relay/sender"
 	templt "mailgun-relay/template"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 
 	_ "embed"
+
+	"github.com/go-chi/chi/v5"
 )
 
 var logger = utils.NewLogger(utils.INFO)
@@ -26,16 +29,23 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	subject := "Prometheus Server Alerts"
-
-	var config sender.Config
-	err = utils.ReadAndUnmarshal("config.json", &config)
+	var configMap sender.ConfigMap
+	err = utils.ReadAndUnmarshal("config.json", &configMap)
 	if err != nil {
 		sendError(err)
 		return
 	}
 
-	err = sender.SendMail(config, subject, payload)
+	configKey := chi.URLParam(r, "configKey")
+	senderConfig, ok := configMap[configKey]
+	if !ok {
+		sendError(fmt.Errorf("Can't get the sender config for '%v'", configKey))
+		return
+	}
+
+	subject := "Prometheus Server Alerts"
+
+	err = sender.SendMail(senderConfig, subject, payload)
 	if err != nil {
 		sendError(err)
 		return
@@ -67,11 +77,13 @@ func webtestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/alert", alertHandler)
-	http.HandleFunc("/webtest", webtestHandler)
+	router := chi.NewRouter()
+
+	router.Post("/alert/{configKey}", alertHandler)
+	router.Get("/webtest", webtestHandler)
 
 	logger.Info("Starting webhook server on :5001")
-	if err := http.ListenAndServe(":5001", nil); err != nil {
+	if err := http.ListenAndServe(":5001", router); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }

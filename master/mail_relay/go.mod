@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/go-chi/chi/v5 v5.0.8 // indirect
+	github.com/go-chi/chi/v5 v5.1.0 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/mailgun/errors v0.3.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect

@@ -12,7 +12,7 @@ type MailgunConfig struct {
 	MailgunApiKey string `json:"MAILGUN_APIKEY"`
 }
 
-type EngineConfig struct {
+type SenderConfig struct {
 	Name          string         `json:"name"`
 	Engine        string         `json:"engine"` // smtp or mailgun
 	Sender        string         `json:"sender"`
@@ -21,7 +21,9 @@ type EngineConfig struct {
 	MailgunConfig *MailgunConfig `json:"mailgun_config"`
 }
 
+type ConfigMap map[string]SenderConfig
+
 type Engine interface {
-	Configure(config EngineConfig) error
+	Configure(config SenderConfig) error
 	Sendmail(subject string, body string) error
 }

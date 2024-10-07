@@ -25,7 +25,7 @@ type SmtpEngine struct {
 	Receivers []string
 }
 
-func (s *SmtpEngine) Configure(config EngineConfig) error {
+func (s *SmtpEngine) Configure(config SenderConfig) error {
 	if config.SmtpConfig == nil {
 		return errors.New("smtp config was not provided")
 	}

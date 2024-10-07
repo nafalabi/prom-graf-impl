@@ -16,7 +16,7 @@ type MailgunEngine struct {
 	Receivers []string
 }
 
-func (m *MailgunEngine) Configure(config EngineConfig) error {
+func (m *MailgunEngine) Configure(config SenderConfig) error {
   if (config.MailgunConfig == nil) {
     return errors.New("mailgun config was not provided")
   }
