@@ -1,109 +1,57 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
+	templt "mailgun-relay/template"
+	"mailgun-relay/utils"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
-	"github.com/joho/godotenv"
+	_ "embed"
 	mailgun "github.com/mailgun/mailgun-go/v4"
 )
 
-type EnvVar struct {
-	domain string
-	apiKey string
-	sender string
-}
+type Receivers = map[string][]string
 
-func (env *EnvVar) loadEnv() {
-	err := godotenv.Load()
+//go:embed bawana.png
+var bawanaIcon []byte
+
+var logger = utils.NewLogger(utils.INFO)
+
+func formatMail(data utils.DataPayload) (string, error) {
+	var result string
+
+	var buff bytes.Buffer
+	tmpl := templt.GetTemplate()
+	err := tmpl.Execute(&buff, data)
 	if err != nil {
-		panic(err)
-	}
-	env.domain = os.Getenv("MAILGUN_DOMAIN")
-	env.apiKey = os.Getenv("MAILGUN_API_KEY")
-	env.sender = os.Getenv("SENDER_MAIL_ADDRESS")
-}
-
-type Alert struct {
-	Status      string            `json:"status"`
-	Labels      map[string]string `json:"labels"`
-	Annotations map[string]string `json:"annotations"`
-	StartsAt    string            `json:"startsAt"`
-	EndsAt      string            `json:"endsAt"`
-}
-
-type AlertmanagerPayload struct {
-	Alerts []Alert `json:"alerts"`
-}
-
-type Receiver = map[string][]string
-
-func getReceivers() (Receiver, error) {
-	var receivers Receiver
-
-	file, err := os.Open("receivers.json")
-	if err != nil {
-		return receivers, fmt.Errorf("Error opening file: %v", err.Error())
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return receivers, fmt.Errorf("Error reading file: %v", err.Error())
+		return result, err
 	}
 
-	if err := json.Unmarshal(bytes, &receivers); err != nil {
-		return receivers, fmt.Errorf("Error decoding JSON: %v", err.Error())
-	}
+	result = buff.String()
 
-	return receivers, nil
+	return result, nil
 }
 
-func formatAlertBody(alerts []Alert) string {
-	var body strings.Builder
-	for _, alert := range alerts {
-		body.WriteString(fmt.Sprintf("**Alert Name:** %s\n", alert.Labels["alertname"]))
-		body.WriteString(fmt.Sprintf("**Status:** %s\n", alert.Status))
-		body.WriteString(fmt.Sprintf("**Starts At:** %s\n", alert.StartsAt))
-		body.WriteString(fmt.Sprintf("**Ends At:** %s\n", alert.EndsAt))
+func sendMail(subject string, recipients []string, body string) error {
+	envVar := utils.NewEnv()
 
-		body.WriteString("\n**Labels:**\n")
-		for k, v := range alert.Labels {
-			body.WriteString(fmt.Sprintf("  - %s: %s\n", k, v))
-		}
+	mg := mailgun.NewMailgun(envVar.Domain, envVar.ApiKey)
 
-		body.WriteString("\n**Annotations:**\n")
-		for k, v := range alert.Annotations {
-			body.WriteString(fmt.Sprintf("  - %s: %s\n", k, v))
-		}
-
-		body.WriteString("\n----------------------------------------\n")
-	}
-	return body.String()
-}
-
-func sendMail(subject string, recipients []string, alerts []Alert) error {
-	envVar := EnvVar{}
-	envVar.loadEnv()
-
-	mg := mailgun.NewMailgun(envVar.domain, envVar.apiKey)
-
-	body := formatAlertBody(alerts)
-
-	message := mg.NewMessage(envVar.sender, subject, body)
+	message := mg.NewMessage(envVar.Sender, subject, "")
 	for _, recipient := range recipients {
 		err := message.AddRecipient(recipient)
 		if err != nil {
+			logger.Error(err.Error())
 			continue
 		}
 	}
+
+	message.SetHtml(body)
+  message.AddInline("./bawana.png")
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -113,25 +61,21 @@ func sendMail(subject string, recipients []string, alerts []Alert) error {
 		return fmt.Errorf("failed to send mail: %v", err)
 	}
 
-	log.Printf("Mail sent successfully to %v", recipients)
+	logger.Info(fmt.Sprintf("Mail sent successfully to %v", recipients))
 	return nil
 }
 
 func alertHandler(w http.ResponseWriter, r *http.Request) {
-	var payload AlertmanagerPayload
+	logger.Info("Starting sending mail alerts...")
 
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-    log.Printf("Could not read request body: %v", err)
-		http.Error(w, "Could not read request body", http.StatusInternalServerError)
-		return
+	sendError := func(err error) {
+		logger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	defer r.Body.Close()
 
-	err = json.Unmarshal(body, &payload)
+	payload, err := utils.GetPayloadData(r.Body)
 	if err != nil {
-    log.Printf("Could not read request body: %v", err)
-		http.Error(w, "Invalid request payload: "+err.Error(), http.StatusBadRequest)
+		sendError(err)
 		return
 	}
 
@@ -142,31 +86,61 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 		subject += "No Alerts"
 	}
 
-	receivers, error := getReceivers()
-	if error != nil {
-    log.Printf("Error getting list of receivers: %v", error)
+	var receivers Receivers
+	err = utils.ReadAndUnmarshal("receivers.json", &receivers)
+	if err != nil {
+		sendError(err)
 		return
 	}
 
 	var recipients []string
-	for groupName, addresses := range receivers {
-		log.Printf("Adding receivers from group '%s' ...", groupName)
-		recipients = append(recipients, addresses...)
+	for groupName, mailAddresses := range receivers {
+		logger.Info(fmt.Sprintf("Adding receivers from group '%s' ...", groupName))
+		recipients = append(recipients, mailAddresses...)
 	}
 
-	err = sendMail(subject, recipients, payload.Alerts)
+	mailBody, err := formatMail(payload)
 	if err != nil {
-		log.Printf("Error sending mail: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(err)
+		return
+	}
+
+	err = sendMail(subject, recipients, mailBody)
+	if err != nil {
+		sendError(err)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Alert processed")
+	logger.Info("Alert successfully processed")
+}
+
+func templateTest(w http.ResponseWriter, r *http.Request) {
+	sendError := func(err error) {
+		logger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	payload := utils.DataPayload{}
+	err := utils.ReadAndUnmarshal("webhook_req.json", &payload)
+	if err != nil {
+		sendError(err)
+		return
+	}
+
+	tmpl := templt.GetTemplate()
+	// err = tmpl.ExecuteTemplate(w, "email.default.html", payload)
+	err = tmpl.Execute(w, payload)
+	if err != nil {
+		sendError(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
 	http.HandleFunc("/alert", alertHandler)
+	http.HandleFunc("/webtest", templateTest)
 
 	log.Println("Starting webhook server on :5001")
 	if err := http.ListenAndServe(":5001", nil); err != nil {

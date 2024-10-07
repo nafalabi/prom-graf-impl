@@ -1,0 +1,419 @@
+<!--
+Style and HTML derived from https://github.com/mailgun/transactional-email-templates
+
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Mailgun
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{{ template "__subject" . }}</title>
+<style>
+/* -------------------------------------
+    GLOBAL
+    A very basic CSS reset
+------------------------------------- */
+* {
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+img {
+  max-width: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: none;
+  width: 100% !important;
+  height: 100%;
+  line-height: 1.6em;
+  /* 1.6em * 14px = 22.4px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 22px;*/
+}
+
+/* Let's make sure all tables have defaults */
+table td {
+  vertical-align: top;
+}
+
+/* -------------------------------------
+    BODY & CONTAINER
+------------------------------------- */
+body {
+  background-color: #f6f6f6;
+}
+
+.body-wrap {
+  background-color: #f6f6f6;
+  width: 100%;
+}
+
+.container {
+  display: block !important;
+  max-width: 600px !important;
+  margin: 0 auto !important;
+  /* makes it centered */
+  clear: both !important;
+}
+
+.content {
+  max-width: 600px;
+  margin: 0 auto;
+  display: block;
+  padding: 20px;
+}
+
+/* -------------------------------------
+    HEADER, FOOTER, MAIN
+------------------------------------- */
+.main {
+  background-color: #fff;
+  border: 1px solid #e9e9e9;
+  border-radius: 3px;
+}
+
+.content-wrap {
+  padding: 30px;
+}
+
+.content-block {
+  padding: 0 0 20px;
+}
+
+.header {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.footer {
+  width: 100%;
+  clear: both;
+  color: #999;
+  padding: 20px;
+}
+.footer p, .footer a, .footer td {
+  color: #999;
+  font-size: 12px;
+}
+
+/* -------------------------------------
+    TYPOGRAPHY
+------------------------------------- */
+h1, h2, h3 {
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  color: #000;
+  margin: 40px 0 0;
+  line-height: 1.2em;
+  font-weight: 400;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 500;
+  /* 1.2em * 32px = 38.4px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 38px;*/
+}
+
+h2 {
+  font-size: 24px;
+  /* 1.2em * 24px = 28.8px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 29px;*/
+}
+
+h3 {
+  font-size: 18px;
+  /* 1.2em * 18px = 21.6px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 22px;*/
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+p, ul, ol {
+  margin-bottom: 10px;
+  font-weight: normal;
+}
+p li, ul li, ol li {
+  margin-left: 5px;
+  list-style-position: inside;
+}
+
+/* -------------------------------------
+    LINKS & BUTTONS
+------------------------------------- */
+a {
+  color: #348eda;
+  text-decoration: underline;
+}
+
+.btn-primary {
+  text-decoration: none;
+  color: #FFF;
+  background-color: #348eda;
+  border: solid #348eda;
+  border-width: 10px 20px;
+  line-height: 2em;
+  /* 2em * 14px = 28px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+  /*line-height: 28px;*/
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+/* -------------------------------------
+    OTHER STYLES THAT MIGHT BE USEFUL
+------------------------------------- */
+.last {
+  margin-bottom: 0;
+}
+
+.first {
+  margin-top: 0;
+}
+
+.aligncenter {
+  text-align: center;
+}
+
+.alignright {
+  text-align: right;
+}
+
+.alignleft {
+  text-align: left;
+}
+
+.clear {
+  clear: both;
+}
+
+/* -------------------------------------
+    ALERTS
+    Change the class depending on warning email, good email or bad email
+------------------------------------- */
+.alert {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 500;
+  padding: 20px;
+  text-align: center;
+  border-radius: 3px 3px 0 0;
+}
+.alert a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+}
+.alert.alert-warning {
+  background-color: #E6522C;
+}
+.alert.alert-bad {
+  background-color: #D0021B;
+}
+.alert.alert-good {
+  background-color: #68B90F;
+}
+
+.heading-container {
+  padding-top: 20px;
+}
+
+/* -------------------------------------
+    RESPONSIVE AND MOBILE FRIENDLY STYLES
+------------------------------------- */
+@media only screen and (max-width: 640px) {
+  body {
+    padding: 0 !important;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 800 !important;
+    margin: 20px 0 5px !important;
+  }
+
+  h1 {
+    font-size: 22px !important;
+  }
+
+  h2 {
+    font-size: 18px !important;
+  }
+
+  h3 {
+    font-size: 16px !important;
+  }
+
+  .container {
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .content {
+    padding: 0 !important;
+  }
+
+  .content-wrap {
+    padding: 10px !important;
+  }
+
+  .invoice {
+    width: 100% !important;
+  }
+  
+  .heading-container {
+    padding: 0!important;
+  }
+
+  .heading {
+    padding: 10px !important;
+    margin: 5px !important;
+    margin-bottom: 10px !important;
+  }
+}
+</style>
+</head>
+
+<body itemscope itemtype="https://schema.org/EmailMessage">
+
+<div class="heading-container" style="">
+  <div class="container main heading" style="padding-bottom: 0;">
+    <div class="content">
+      Dear {{ .CustomerName }},
+      <br /><br />
+      This is an automated notification info regarding the status of one or more affected servers below.
+    </div>
+  </div>
+</div>
+
+<table class="body-wrap">
+  <tr>
+    <td></td>
+    <td class="container" width="600">
+      <div class="content">
+        <table class="main" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            {{ if gt (len .Alerts.Firing) 0 }}
+            <td class="alert alert-warning">
+              {{ .Alerts | len }} alert{{ if gt (len .Alerts) 1 }}s{{ end }} for {{ range .GroupLabels.SortedPairs }}
+                {{ .Name }}={{ .Value }}
+              {{ end }}
+            </td>
+            {{ else }}
+            <td class="alert alert-good">
+              {{ .Alerts | len }} alert{{ if gt (len .Alerts) 1 }}s{{ end }} for {{ range .GroupLabels.SortedPairs }}
+                {{ .Name }}={{ .Value }} 
+              {{ end }}
+            </td>
+            {{ end }}
+          </tr>
+          <tr>
+            <td class="content-wrap">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td class="content-block">
+                    <a href='{{ template "__alertmanagerURL" . }}' class="btn-primary">View in {{ template "__alertmanager" . }}</a>
+                  </td>
+                </tr>
+                {{ if gt (len .Alerts.Firing) 0 }}
+                <tr>
+                  <td class="content-block">
+                    <strong>[{{ .Alerts.Firing | len }}] Firing</strong>
+                  </td>
+                </tr>
+                {{ end }}
+                {{ range .Alerts.Firing }}
+                <tr>
+                  <td class="content-block">
+                    <strong>Labels</strong><br />
+                    {{ range .Labels.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+                    {{ if gt (len .Annotations) 0 }}<strong>Annotations</strong><br />{{ end }}
+                    {{ range .Annotations.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+                    <a href="{{ .GeneratorURL }}">Source</a><br />
+                  </td>
+                </tr>
+                {{ end }}
+
+                {{ if gt (len .Alerts.Resolved) 0 }}
+                  {{ if gt (len .Alerts.Firing) 0 }}
+                <tr>
+                  <td class="content-block">
+                    <br />
+                    <hr />
+                    <br />
+                  </td>
+                </tr>
+                  {{ end }}
+                <tr>
+                  <td class="content-block">
+                    <strong>[{{ .Alerts.Resolved | len }}] Resolved</strong>
+                  </td>
+                </tr>
+                {{ end }}
+                {{ range .Alerts.Resolved }}
+                <tr>
+                  <td class="content-block">
+                    <strong>Labels</strong><br />
+                    {{ range .Labels.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+                    {{ if gt (len .Annotations) 0 }}<strong>Annotations</strong><br />{{ end }}
+                    {{ range .Annotations.SortedPairs }}{{ .Name }} = {{ .Value }}<br />{{ end }}
+                    <a href="{{ .GeneratorURL }}">Source</a><br />
+                  </td>
+                </tr>
+                {{ end }}
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <div class="footer">
+          <table width="100%">
+            <tr>
+              <td class="aligncenter content-block">
+                  Best regards, Bawana IT Team.
+                <div>
+                  <a href="https://bawana.com">
+                    <img src="data:image/png;base64,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" />
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div></div>
+    </td>
+    <td></td>
+  </tr>
+</table>
+
+</body>
+</html>
