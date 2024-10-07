@@ -1,0 +1,22 @@
+{
+  "smtp": {
+    "engine": "smtp",
+    "sender": "no-reply@example.com",
+    "receivers": ["receiver1@example.com", "receiver2@example.com"],
+    "smtp_config": {
+      "HOST": "smtp.example.com",
+      "PORT": "587",
+      "USERNAME": "smtp_user",
+      "PASSWORD": "smtp_password"
+    }
+  },
+  "mailgun": {
+    "engine": "mailgun",
+    "sender": "no-reply@mg.example.com",
+    "receivers": ["receiver1@example.com", "receiver2@example.com"],
+    "mailgun_config": {
+      "MAILGUN_DOMAIN": "mg.example.com",
+      "MAILGUN_APIKEY": "your-mailgun-api-key"
+    }
+  }
+}

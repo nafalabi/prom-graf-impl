@@ -2,68 +2,19 @@ package main
 
 import (
 	"bytes"
-	"context"
-	"fmt"
 	"log"
+	"mailgun-relay/sender"
 	templt "mailgun-relay/template"
 	"mailgun-relay/utils"
 	"net/http"
-	"time"
 
 	_ "embed"
-	mailgun "github.com/mailgun/mailgun-go/v4"
 )
 
 type Receivers = map[string][]string
 
-//go:embed bawana.png
-var bawanaIcon []byte
-
 var logger = utils.NewLogger(utils.INFO)
 
-func formatMail(data utils.DataPayload) (string, error) {
-	var result string
-
-	var buff bytes.Buffer
-	tmpl := templt.GetTemplate()
-	err := tmpl.Execute(&buff, data)
-	if err != nil {
-		return result, err
-	}
-
-	result = buff.String()
-
-	return result, nil
-}
-
-func sendMail(subject string, recipients []string, body string) error {
-	envVar := utils.NewEnv()
-
-	mg := mailgun.NewMailgun(envVar.Domain, envVar.ApiKey)
-
-	message := mg.NewMessage(envVar.Sender, subject, "")
-	for _, recipient := range recipients {
-		err := message.AddRecipient(recipient)
-		if err != nil {
-			logger.Error(err.Error())
-			continue
-		}
-	}
-
-	message.SetHtml(body)
-  message.AddInline("./bawana.png")
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	_, _, err := mg.Send(ctx, message)
-	if err != nil {
-		return fmt.Errorf("failed to send mail: %v", err)
-	}
-
-	logger.Info(fmt.Sprintf("Mail sent successfully to %v", recipients))
-	return nil
-}
 
 func alertHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Starting sending mail alerts...")
@@ -86,26 +37,23 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 		subject += "No Alerts"
 	}
 
-	var receivers Receivers
-	err = utils.ReadAndUnmarshal("receivers.json", &receivers)
+	var buff bytes.Buffer
+	tmpl := templt.GetTemplate()
+	err = tmpl.Execute(&buff, payload)
+	if err != nil {
+		sendError(err)
+		return
+	}
+  mailBody := buff.String()
+
+	var config sender.Config
+	err = utils.ReadAndUnmarshal("config.json", &config)
 	if err != nil {
 		sendError(err)
 		return
 	}
 
-	var recipients []string
-	for groupName, mailAddresses := range receivers {
-		logger.Info(fmt.Sprintf("Adding receivers from group '%s' ...", groupName))
-		recipients = append(recipients, mailAddresses...)
-	}
-
-	mailBody, err := formatMail(payload)
-	if err != nil {
-		sendError(err)
-		return
-	}
-
-	err = sendMail(subject, recipients, mailBody)
+  err = sender.SendMail(config, subject, mailBody)
 	if err != nil {
 		sendError(err)
 		return
