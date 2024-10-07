@@ -26,12 +26,7 @@ func alertHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	subject := "Prometheus AlertManager - "
-	if len(payload.Alerts) > 0 {
-		subject += payload.Alerts[0].Labels["alertname"] + " - " + payload.Alerts[0].Status
-	} else {
-		subject += "No Alerts"
-	}
+	subject := "Prometheus Server Alerts"
 
 	var config sender.Config
 	err = utils.ReadAndUnmarshal("config.json", &config)
