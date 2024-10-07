@@ -80,7 +80,7 @@ services:
 
   mail_relay:
     build:
-      context: ./mailgun_relay
+      context: ./mail_relay
       dockerfile: Dockerfile
     expose: ["5001"]
     networks:
