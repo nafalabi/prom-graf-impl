@@ -3,7 +3,6 @@ module mailgun-relay
 go 1.22.1
 
 require (
-	github.com/joho/godotenv v1.5.1
 	github.com/mailgun/mailgun-go/v4 v4.16.0
 	golang.org/x/text v0.18.0
 )
